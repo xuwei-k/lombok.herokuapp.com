@@ -73,7 +73,10 @@ object App extends unfiltered.filter.Plan {
         Result(true,"invalid params "+ str,Nil)
       ).toJsonResponse
 
-    case GET(Path("/")) => Html(
+    case GET(Path("/")) =>
+      val initCode = "def hello(){'hello'}"
+
+      Html(
       <html>
         <head>
           <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js" />
@@ -81,17 +84,11 @@ object App extends unfiltered.filter.Plan {
         </head>
         <body>
           <button id='compile' >compile</button>
-          <textarea id='xtendcode' cols='50' rows='20'></textarea>
+          <textarea id='xtendcode' cols='50' rows='20'>{initCode}</textarea>
           <textarea id='javacode' cols='50' rows='20'></textarea>
         </body>
       </html>
-    )
-/*
-          <button text='compile' onClick='submitCode()' />
-    case GET(_) => Html(
-      <h1><a href={GITHUB}>{GITHUB}</a><br />GUI client will be soon available ... </h1>
-    )
-*/
+      )
   }
 }
 
