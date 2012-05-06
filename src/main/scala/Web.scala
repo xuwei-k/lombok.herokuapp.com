@@ -51,8 +51,16 @@ object App extends unfiltered.filter.Plan {
 
   def intent = {
     case r @ POST(Path("/")) =>
+      val str = Body.string(r)
+      println(str)
+      parseOpt(str).map{ j =>
+        println(pretty(render(j)))
+      }.getOrElse{
+        println("fail parse json. " + str + " is not valid json")
+      }
+
       val sourceFiles = for{
-        JObject(List(JField(Common.FILES,JObject(json)))) <- JsonBody(r)
+        JObject(List(JField(Common.FILES,JObject(json)))) <- parseOpt(str)
         files = for{
           JField(name,JString(contents)) <- json
         } yield SourceFile(name,contents)
@@ -62,12 +70,28 @@ object App extends unfiltered.filter.Plan {
         case Right(seq)  => Result(false,"",seq)
         case Left(error) => Result(true,error,Nil)
       }.getOrElse(
-        Result(true,"invalid params",Nil)
+        Result(true,"invalid params "+ str,Nil)
       ).toJsonResponse
 
+    case GET(Path("/")) => Html(
+      <html>
+        <head>
+          <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js" />
+          <script type="text/javascript" src="/xtendheroku.js" />
+        </head>
+        <body>
+          <button id='compile' >compile</button>
+          <textarea id='xtendcode' cols='50' rows='20'></textarea>
+          <textarea id='javacode' cols='50' rows='20'></textarea>
+        </body>
+      </html>
+    )
+/*
+          <button text='compile' onClick='submitCode()' />
     case GET(_) => Html(
       <h1><a href={GITHUB}>{GITHUB}</a><br />GUI client will be soon available ... </h1>
     )
+*/
   }
 }
 
@@ -86,7 +110,7 @@ case class Result(error:Boolean,message:String,result:Seq[SourceFile]){
 object Web {
   def main(args: Array[String]) {
     val port = Properties.envOrElse("PORT",Common.DEFAULT_PORT).toInt
-    unfiltered.jetty.Http(port).filter(App).run
+    unfiltered.jetty.Http(port).resources(getClass.getResource("/")).filter(App).run
   }
 }
 
