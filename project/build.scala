@@ -41,7 +41,7 @@ object build extends Build{
     )
   )
 
-  val u = "0.6.1"
+  val u = "0.6.2"
 
   lazy val server = Project(
     "server",
