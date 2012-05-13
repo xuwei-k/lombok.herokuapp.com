@@ -19,8 +19,8 @@ object build extends Build{
 
   lazy val root = Project(
     "root",
-    file("root"),
-    settings = buildSettings ++ Seq(
+    file("."),
+    settings = buildSettings ++ startScriptForClassesSettings ++ Seq(
     )
   )aggregate(server,client,common,jointest)
 
@@ -45,7 +45,7 @@ object build extends Build{
 
   lazy val server = Project(
     "server",
-    file("."),
+    file("server"),
     settings = buildSettings ++ startScriptForClassesSettings ++ Seq(
       libraryDependencies ++= Seq("filter","jetty","json").map{n=>
         "net.databinder" %% ("unfiltered-"+n) % u
