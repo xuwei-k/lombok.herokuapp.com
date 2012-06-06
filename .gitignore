@@ -3,7 +3,7 @@
 /project/project/target
 common/target
 client/target
-root/target
+server/target
 jointest/target
 *.jar
 *.class
