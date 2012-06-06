@@ -8,7 +8,7 @@ object build extends Build{
       organization := "com.herokuapp.xtend",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked"),
-      scalaVersion := "2.9.1",
+      scalaVersion := "2.9.2",
       shellPrompt in ThisBuild := { state =>
         Project.extract(state).currentRef.project + "> "
       },
@@ -41,7 +41,7 @@ object build extends Build{
     )
   )
 
-  val u = "0.6.2"
+  val u = "0.6.3"
 
   lazy val server = Project(
     "server",
@@ -71,8 +71,8 @@ object build extends Build{
     file("client"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaj" %% "scalaj-http" % "0.3.0",
-        "net.liftweb" %% "lift-json" % "2.4"
+        "org.scalaj" %% "scalaj-http" % "0.3.1",
+        "net.liftweb" % "lift-json_2.9.1" % "2.4"
       )
     )
   )dependsOn(common)
