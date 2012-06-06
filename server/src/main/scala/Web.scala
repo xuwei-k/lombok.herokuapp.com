@@ -11,7 +11,7 @@ import org.apache.log4j.BasicConfigurator
 import org.eclipse.xtext.xtend2.Xtend2StandaloneSetup
 import net.liftweb.json._
 
-object App extends unfiltered.filter.Plan {
+class App(debug:Boolean) extends unfiltered.filter.Plan {
 
   def xtend2java(src:Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>
@@ -52,11 +52,13 @@ object App extends unfiltered.filter.Plan {
   def intent = {
     case r @ POST(Path("/")) =>
       val str = Body.string(r)
-      println(str)
-      parseOpt(str).map{ j =>
-        println(pretty(render(j)))
-      }.getOrElse{
-        println("fail parse json. " + str + " is not valid json")
+      if(debug){
+        println(str)
+        parseOpt(str).map{ j =>
+          println(pretty(render(j)))
+        }.getOrElse{
+          println("fail parse json. " + str + " is not valid json")
+        }
       }
 
       val sourceFiles = for{
@@ -106,8 +108,13 @@ case class Result(error:Boolean,message:String,result:Seq[SourceFile]){
 
 object Web {
   def main(args: Array[String]) {
+    val debug = Option(args).flatMap{_.headOption.map{java.lang.Boolean.parseBoolean}}.getOrElse(false)
     val port = Properties.envOrElse("PORT",Common.DEFAULT_PORT).toInt
-    unfiltered.jetty.Http(port).resources(getClass.getResource("/")).filter(App).run
+    println("debug mode=" + debug + " port=" + port)
+    if(debug){
+      unfiltered.util.Browser.open("http://localhost:" + port)
+    }
+    unfiltered.jetty.Http(port).resources(getClass.getResource("/")).filter(new App(debug)).run
   }
 }
 
