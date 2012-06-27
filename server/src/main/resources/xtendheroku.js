@@ -17,7 +17,8 @@ $(function(){
         function(data){
           console.log(data);
           if(! data.error){
-            $("#javacode").text(data.result["A.java"])
+            $("#javacode").text(data.result["A.java"]);
+            prettyPrint();
           }else{
             $("#error_message").append(data.html_message)
           }

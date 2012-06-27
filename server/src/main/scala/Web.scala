@@ -105,13 +105,17 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
           <script type="text/javascript" src="/xtendheroku.js" />
           <title>xtend {XtendVersion()} web interface</title>
           <link rel="stylesheet" href="./xtendheroku.css" type="text/css" />
+          <script src="google-code-prettify/prettify.js" type="text/javascript" />
+          <link href="google-code-prettify/prettify.css" rel="stylesheet" type="text/css"/>
         </head>
         <body>
           <h1><a href={XTEND_SITE}>xtend</a> {XtendVersion()} web interface</h1>
           <p><a href={GITHUB}>this program source code</a></p>
-          <button id='compile' >compile</button>
-          <textarea id='xtendcode' cols='50' rows='20'>{initCode}</textarea>
-          <textarea id='javacode' cols='50' rows='20'></textarea>
+          <p><button id='compile' >compile</button></p>
+          <div class='src_wrap_div'>
+            <div><textarea class="source_code" id='xtendcode'>{initCode}</textarea></div>
+            <div><pre class="source_code prettyprint" id='javacode'/></div>
+          </div>
           <div id='error_message' />
         </body>
       </html>
