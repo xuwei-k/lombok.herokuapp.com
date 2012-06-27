@@ -14,13 +14,16 @@ import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,SimpleLayout
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
+  lazy val libClass = classOf[org.eclipse.xtext.xbase.lib.CollectionLiterals]
+  lazy val xtendLibJar = new File(libClass.getProtectionDomain.getCodeSource.getLocation.getFile)
+
   def xtend2java(src:Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>
       src.foreach{f =>
         IO.writeLines(in / f.name ,f.contents.pure[Seq] )
       }
       IO.withTemporaryDirectory{out =>
-        compileXtend(out,in,file(".").pure[Seq])
+        compileXtend(out,in,Seq(xtendLibJar))
       }
     }
   }
