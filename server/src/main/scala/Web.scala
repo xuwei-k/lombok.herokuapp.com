@@ -104,6 +104,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
           <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js" />
           <script type="text/javascript" src="/xtendheroku.js" />
           <title>xtend {XtendVersion()} web interface</title>
+          <link rel="stylesheet" href="./xtendheroku.css" type="text/css" />
         </head>
         <body>
           <h1><a href={XTEND_SITE}>xtend</a> {XtendVersion()} web interface</h1>
