@@ -5,6 +5,7 @@ object Common{
   val DEFAULT_PORT = "8080"
   val ERROR        = "error"
   val MESSAGE      = "message"
+  val HTML_MESSAGE = "html_message"
   val RESULT       = "result"
 }
 

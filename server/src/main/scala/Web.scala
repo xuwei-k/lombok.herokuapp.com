@@ -5,12 +5,12 @@ import unfiltered.request._
 import unfiltered.response._
 import util.Properties
 import sbt.{Path=>_,Logger=>_,Level=>_,_}
-import java.io.File
+import java.io.{Writer,File}
 import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
 import org.apache.log4j.BasicConfigurator
 import org.eclipse.xtend.core.XtendStandaloneSetup
 import net.liftweb.json._
-import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,SimpleLayout}
+import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,HTMLLayout,SimpleLayout,Layout}
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
@@ -28,34 +28,40 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
     }
   }
 
-  def setupLogger(writer:java.io.Writer){
+  def createLoggers():(Writer,Writer) = {
     val logger = Log4jLogger.getLogger("org.eclipse.xtext")
     logger.setAdditivity(false)
     logger.setLevel(Level.DEBUG)
     logger.removeAllAppenders()
-    val appender = new WriterAppender(new SimpleLayout(),writer)
-    logger.addAppender(appender)
+    def add(layout:Layout):Writer = {
+      val w = new java.io.CharArrayWriter
+      val appender = new WriterAppender(layout,w)
+      logger.addAppender(appender)
+      w
+    }
+    (new SimpleLayout(),new HTMLLayout()).mapElements(add,add)
   }
 
-  def compileXtend(out:File,in:File,cp:Seq[File]):Either[String,Seq[SourceFile]] = {
-    val writer = new java.io.CharArrayWriter
+  def compileXtend(out:File,in:File,cp:Seq[File]):Either[ErrorMessage,Seq[SourceFile]] = {
+    val (simple,html) = createLoggers()
     try{
-      setupLogger(writer)
+      val resultWriter = new java.io.CharArrayWriter
       val injector = new XtendStandaloneSetup().createInjectorAndDoEMFRegistration
       val c = injector.getInstance(classOf[XtendBatchCompiler])
       c.setOutputPath(out.toString())
       c.setSourcePath(in.toString())
-      c.setOutputWriter(writer)
-      c.setErrorWriter(writer)
+      c.setOutputWriter(resultWriter)
+//      c.setErrorWriter(simple) // TODO invalid ?
       c.setVerbose(true)
       c.setClassPath(cp.map{_.getAbsolutePath}.mkString(File.pathSeparator))
       if(c.compile()){
         (out ** "*.java").get.map{f => SourceFile(f.getName,IO.read(f))}.right
       }else{
-        ("compile fail\n" + writer.toString).left
+        ErrorMessage(("compile fail" + simple.toString),html.toString).left
       }
     }catch{
-      case e => (writer.toString + "\n\n" + e.toString).left
+      case e =>
+        ErrorMessage(Seq(simple.toString,e.toString).mkString("\n\n"),html.toString).left
     }
   }
 
@@ -81,11 +87,12 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       }yield files
 
       sourceFiles.map(xtend2java).map{
-        case Right(seq)  => Result(false,"",seq)
+        case Right(seq)  => Result(false,EmptyError,seq)
         case Left(error) => Result(true,error,Nil)
-      }.getOrElse(
-        Result(true,"invalid params "+ str,Nil)
-      ).toJsonResponse
+      }.getOrElse{
+        val msg = "invalid params " + str
+        Result(true,ErrorMessage(msg,msg),Nil)
+      }.toJsonResponse
 
     case GET(Path("/")) =>
       val initCode = "def hello(){'hello'}"
@@ -100,6 +107,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
           <button id='compile' >compile</button>
           <textarea id='xtendcode' cols='50' rows='20'>{initCode}</textarea>
           <textarea id='javacode' cols='50' rows='20'></textarea>
+          <div id='error_message' />
         </body>
       </html>
       )
@@ -108,12 +116,17 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
 
 case class SourceFile(name:String,contents:String)
 
-case class Result(error:Boolean,message:String,result:Seq[SourceFile]){
+case class ErrorMessage(simple:String,html:String)
+
+object EmptyError extends ErrorMessage("","")
+
+case class Result(error:Boolean,msg:ErrorMessage,result:Seq[SourceFile]){
   import net.liftweb.json.JsonDSL._
 
   def toJsonResponse = Json(
     (Common.ERROR   -> error) ~
-    (Common.MESSAGE -> message) ~
+    (Common.MESSAGE -> msg.simple) ~
+    (Common.HTML_MESSAGE -> msg.html) ~
     (Common.RESULT  -> JObject(result.map{f => JField(f.name,JString(f.contents))}.toList) )
   )
 }

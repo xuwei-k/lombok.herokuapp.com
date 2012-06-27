@@ -19,7 +19,7 @@ $(function(){
           if(! data.error){
             $("#javacode").text(data.result["A.java"])
           }else{
-            $("#javacode").text(data.message)
+            $("#error_message").append(data.html_message)
           }
         },
         "JSON"
