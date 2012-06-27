@@ -66,6 +66,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
   }
 
   val GITHUB = "https://github.com/xuwei-k/xtend.herokuapp.com"
+  val XTEND_SITE = "http://www.eclipse.org/xtend/"
 
   def intent = {
     case r @ POST(Path("/")) =>
@@ -102,8 +103,11 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         <head>
           <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js" />
           <script type="text/javascript" src="/xtendheroku.js" />
+          <title>xtend {XtendVersion()} web interface</title>
         </head>
         <body>
+          <h1><a href={XTEND_SITE}>xtend</a> {XtendVersion()} web interface</h1>
+          <p><a href={GITHUB}>this program source code</a></p>
           <button id='compile' >compile</button>
           <textarea id='xtendcode' cols='50' rows='20'>{initCode}</textarea>
           <textarea id='javacode' cols='50' rows='20'></textarea>
