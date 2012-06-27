@@ -42,6 +42,7 @@ object build extends Build{
   )
 
   val u = "0.6.3"
+  val xtendVersion = "2.3.0"
 
   lazy val server = Project(
     "server",
@@ -53,10 +54,9 @@ object build extends Build{
       libraryDependencies ++= Seq(
         "net.databinder" %% "unfiltered-spec" % u % "test",
         "log4j" % "log4j" % "1.2.16" % "compile",
-        "org.eclipse.xtend" % "org.eclipse.xtend.lib" % "2.3.0",
-        "org.eclipse.xtext" % "org.eclipse.xtext.xbase.lib" % "2.3.0",
-        "org.eclipse.xtend" % "org.eclipse.xtend.standalone" % "2.3.0",
-//        "org.eclipse.xtend" % "org.eclipse.xtend.maven" % "2.3.0",
+        "org.eclipse.xtend" % "org.eclipse.xtend.lib" % xtendVersion,
+        "org.eclipse.xtext" % "org.eclipse.xtext.xbase.lib" % xtendVersion,
+        "org.eclipse.xtend" % "org.eclipse.xtend.standalone" % xtendVersion,
         "org.eclipse.emf" % "codegen" % "2.2.3"
       ),
       libraryDependencies <+= sbtDependency,
@@ -65,9 +65,23 @@ object build extends Build{
         "https://oss.sonatype.org/content/repositories/releases/",
         "http://build.eclipse.org/common/xtend/maven/",
         "http://maven.eclipse.org/nexus/content/groups/public/"
-      ).map{u => u at u}
+      ).map{u => u at u},
+      sourceGenerators in Compile <+= (sourceManaged in Compile).map{xtendVersionInfoGenerate}
     )
   )dependsOn(common)
+
+  def xtendVersionInfoGenerate(dir:File):Seq[File] = {
+    val src =
+      """package com.herokuapp.xtend
+        |
+        |object XtendVersion{
+        |  def apply() = "%s"
+        |}""".format(xtendVersion).stripMargin
+    println(src)
+    val file = dir / "XtendVersion.scala"
+    IO.write(file,src)
+    Seq(file)
+  }
 
   lazy val client = Project(
     "client",
