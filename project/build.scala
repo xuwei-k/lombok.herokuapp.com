@@ -53,7 +53,10 @@ object build extends Build{
       libraryDependencies ++= Seq(
         "net.databinder" %% "unfiltered-spec" % u % "test",
         "log4j" % "log4j" % "1.2.16" % "compile",
-        "org.eclipse.xtend2" % "org.eclipse.xtend2.standalone" % "2.2.1",
+        "org.eclipse.xtend" % "org.eclipse.xtend.lib" % "2.3.0",
+        "org.eclipse.xtext" % "org.eclipse.xtext.xbase.lib" % "2.3.0",
+        "org.eclipse.xtend" % "org.eclipse.xtend.standalone" % "2.3.0",
+//        "org.eclipse.xtend" % "org.eclipse.xtend.maven" % "2.3.0",
         "org.eclipse.emf" % "codegen" % "2.2.3"
       ),
       libraryDependencies <+= sbtDependency,

@@ -6,9 +6,9 @@ import unfiltered.response._
 import util.Properties
 import sbt.{Path=>_,Logger=>_,Level=>_,_}
 import java.io.File
-import org.eclipse.xtext.xtend2.compiler.batch.Xtend2BatchCompiler
+import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
 import org.apache.log4j.BasicConfigurator
-import org.eclipse.xtext.xtend2.Xtend2StandaloneSetup
+import org.eclipse.xtend.core.XtendStandaloneSetup
 import net.liftweb.json._
 import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,SimpleLayout}
 
@@ -38,8 +38,8 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
     val writer = new java.io.CharArrayWriter
     try{
       setupLogger(writer)
-      val injector = new Xtend2StandaloneSetup().createInjectorAndDoEMFRegistration
-      val c = injector.getInstance(classOf[Xtend2BatchCompiler])
+      val injector = new XtendStandaloneSetup().createInjectorAndDoEMFRegistration
+      val c = injector.getInstance(classOf[XtendBatchCompiler])
       c.setOutputPath(out.toString())
       c.setSourcePath(in.toString())
       c.setOutputWriter(writer)
