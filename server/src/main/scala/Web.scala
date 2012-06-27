@@ -4,12 +4,13 @@ import scalaz._,Scalaz._
 import unfiltered.request._
 import unfiltered.response._
 import util.Properties
-import sbt.{Path=>_,_}
+import sbt.{Path=>_,Logger=>_,Level=>_,_}
 import java.io.File
 import org.eclipse.xtext.xtend2.compiler.batch.Xtend2BatchCompiler
 import org.apache.log4j.BasicConfigurator
 import org.eclipse.xtext.xtend2.Xtend2StandaloneSetup
 import net.liftweb.json._
+import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,SimpleLayout}
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
@@ -24,11 +25,19 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
     }
   }
 
+  def setupLogger(writer:java.io.Writer){
+    val logger = Log4jLogger.getLogger("org.eclipse.xtext")
+    logger.setAdditivity(false)
+    logger.setLevel(Level.DEBUG)
+    logger.removeAllAppenders()
+    val appender = new WriterAppender(new SimpleLayout(),writer)
+    logger.addAppender(appender)
+  }
 
   def compileXtend(out:File,in:File,cp:Seq[File]):Either[String,Seq[SourceFile]] = {
+    val writer = new java.io.CharArrayWriter
     try{
-      val writer = new java.io.CharArrayWriter
-      BasicConfigurator.configure()
+      setupLogger(writer)
       val injector = new Xtend2StandaloneSetup().createInjectorAndDoEMFRegistration
       val c = injector.getInstance(classOf[Xtend2BatchCompiler])
       c.setOutputPath(out.toString())
@@ -43,7 +52,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         ("compile fail\n" + writer.toString).left
       }
     }catch{
-      case e => e.toString.left
+      case e => (writer.toString + "\n\n" + e.toString).left
     }
   }
 
