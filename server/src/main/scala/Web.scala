@@ -95,7 +95,6 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       }.toJsonResponse
 
     case GET(Path("/")) =>
-      val initCode = "def hello(){'hello'}"
 
       Html(
       <html>
@@ -110,9 +109,22 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         <body>
           <h1><a href={XTEND_SITE}>xtend</a> {XtendVersion()} web interface</h1>
           <p><a href={GITHUB}>this program source code</a></p>
-          <p><button id='compile' >compile</button></p>
+          <p>
+            <button id='compile' >compile</button>
+            <form>
+            <input type='radio' name='xtend_edit_type' id='edit_type_auto' value='auto'>auto</input>
+            <input type='radio' name='xtend_edit_type' id='edit_type_manual' value='manual'>manual</input>
+            </form>
+          </p>
           <div class='src_wrap_div'>
-            <div><textarea class="source_code" id='xtendcode'>{initCode}</textarea></div>
+            <div>
+              <div id="xtendcode_wrap" class="source_code">
+                <p class="xtend_class_wrap">class <input id="xtend_class_name" type="text" />{"{"}</p>
+                <p id='xtend_file_name_wrap'>file name<input id="xtend_file_name" type="text" /></p>
+                <textarea id='xtendcode' />
+                <p class="xtend_class_wrap" >{"}"}</p>
+              </div>
+            </div>
             <div><pre class="source_code prettyprint" id='javacode'/></div>
           </div>
           <div id='error_message' />
@@ -145,7 +157,7 @@ object Web {
     val port = Properties.envOrElse("PORT",Common.DEFAULT_PORT).toInt
     println("debug mode=" + debug + " port=" + port)
     if(debug){
-      unfiltered.util.Browser.open("http://localhost:" + port)
+      unfiltered.util.Browser.open("http://127.0.0.1:" + port)
     }
     unfiltered.jetty.Http(port).resources(getClass.getResource("/")).filter(new App(debug)).run
   }

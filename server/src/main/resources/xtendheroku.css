@@ -16,9 +16,23 @@ h1{
   padding: 5px;
 }
 
-#xtendcode{
+p input textarea{
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.xtend_class_wrap{
+  margin:0 auto 0 auto;
+}
+
+#xtendcode_wrap{
   float:left;
   margin:0 10px 0 auto;
+}
+
+#xtendcode{
+  height:90%;
+  width:90%;
 }
 
 #javacode{
