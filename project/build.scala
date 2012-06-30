@@ -66,7 +66,8 @@ object build extends Build{
         "http://build.eclipse.org/common/xtend/maven/",
         "http://maven.eclipse.org/nexus/content/groups/public/"
       ).map{u => u at u},
-      sourceGenerators in Compile <+= (sourceManaged in Compile).map{xtendVersionInfoGenerate}
+      sourceGenerators in Compile <+= (sourceManaged in Compile).map{xtendVersionInfoGenerate},
+      retrieveManaged := true
     )
   )dependsOn(common)
 

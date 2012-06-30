@@ -14,8 +14,7 @@ import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,HTMLLayout,S
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
-  lazy val libClass = classOf[org.eclipse.xtext.xbase.lib.CollectionLiterals]
-  lazy val xtendLibJar = new File(libClass.getProtectionDomain.getCodeSource.getLocation.getFile)
+  lazy val jarList = file("lib_managed") ** "*.jar" get
 
   def xtend2java(src:Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>
@@ -23,7 +22,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         IO.writeLines(in / f.name ,f.contents.pure[Seq] )
       }
       IO.withTemporaryDirectory{out =>
-        compileXtend(out,in,Seq(xtendLibJar))
+        compileXtend(out,in,jarList)
       }
     }
   }
