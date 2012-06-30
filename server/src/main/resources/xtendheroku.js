@@ -47,6 +47,8 @@ $(function(){
 
       console.log(sendData);
 
+      $("#error_message").children().remove();
+
       jQuery.post(
         '/',
         JSON.stringify(sendData),
