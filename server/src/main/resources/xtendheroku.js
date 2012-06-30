@@ -31,10 +31,10 @@ $(function(){
         var file_name = class_name + ".xtend";
         var source_content = "class " + class_name + " {\n" + $("#xtendcode").val() + "}";
       }else{
-        var file = $("#xtend_file_name").val()
-        if(file == null || file == "")return;
+        var class_name = $("#xtend_file_name").val()
+        if(class_name == null || class_name == "")return;
 
-        var file_name = file + ".xtend";
+        var file_name = class_name + ".xtend";
         var source_content = $("#xtendcode").val();
       }
 
@@ -53,7 +53,7 @@ $(function(){
         function(data){
           console.log(data);
           if(! data.error){
-            $("#javacode").text(data.result["A.java"]);
+            $("#javacode").text(data.result[class_name + ".java"]);
             prettyPrint();
           }else{
             $("#error_message").append(data.html_message)
