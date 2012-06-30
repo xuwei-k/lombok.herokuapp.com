@@ -18,6 +18,18 @@ $(function(){
     }
   );
 
+  $("#clear_javacode").click(
+    function(){
+      $("#javacode").children().remove();
+    }
+  );
+
+  $("#clear_error_message").click(
+    function(){
+      $("#error_message").children().remove();
+    }
+  );
+
   $("#compile").click(
     function(){
       console.log("click!!");
@@ -48,6 +60,7 @@ $(function(){
       console.log(sendData);
 
       $("#error_message").children().remove();
+      $("#javacode").children().remove();
 
       jQuery.post(
         '/',

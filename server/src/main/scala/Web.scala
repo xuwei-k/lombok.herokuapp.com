@@ -111,6 +111,8 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
           <p><a href={GITHUB}>this program source code</a></p>
           <p>
             <button id='compile' >compile</button>
+            <button id='clear_javacode' >clear java code</button>
+            <button id='clear_error_message' >clear error message</button>
             <form>
             <input type='radio' name='xtend_edit_type' id='edit_type_auto' value='auto'>auto</input>
             <input type='radio' name='xtend_edit_type' id='edit_type_manual' value='manual'>manual</input>
