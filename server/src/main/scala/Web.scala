@@ -14,7 +14,7 @@ import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,HTMLLayout,S
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
-  lazy val jarList = file("lib_managed") ** "*.jar" get
+  lazy val jarList = { file("lib_managed") ** "*.jar" get } :+ IO.classLocationFile[Predef.type]
 
   def xtend2java(src:Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>
