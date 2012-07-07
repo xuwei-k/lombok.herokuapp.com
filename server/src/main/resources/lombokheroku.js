@@ -41,7 +41,7 @@ $(function(){
         }
 
         var file_name = class_name + ".java";
-        var source_content = "class " + class_name + " {\n" + $("#lombokcode").val() + "}";
+        var source_content = "import lombok.*;\n\nclass " + class_name + " {\n" + $("#lombokcode").val() + "}";
       }else{
         var class_name = $("#lombok_file_name").val()
         if(class_name == null || class_name == "")return;
