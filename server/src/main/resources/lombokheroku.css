@@ -21,16 +21,16 @@ p input textarea{
   font-family: inherit;
 }
 
-.xtend_class_wrap{
+.lombok_class_wrap{
   margin:0 auto 0 auto;
 }
 
-#xtendcode_wrap{
+#lombokcode_wrap{
   float:left;
   margin:0 10px 0 auto;
 }
 
-#xtendcode{
+#lombokcode{
   height:90%;
   width:90%;
 }

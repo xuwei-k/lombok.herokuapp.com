@@ -5,7 +5,7 @@ object build extends Build{
 
   lazy val buildSettings =
     Defaults.defaultSettings ++ Seq(
-      organization := "com.herokuapp.xtend",
+      organization := "com.herokuapp.lombok",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked"),
       scalaVersion := "2.9.2",
@@ -13,7 +13,7 @@ object build extends Build{
         Project.extract(state).currentRef.project + "> "
       },
       initialCommands in console := Seq(
-        "scalaz","Scalaz","com.herokuapp.xtend"
+        "scalaz","Scalaz","com.herokuapp.lombok"
       ).map{"import " + _ + "._;"}.mkString
     )
 
@@ -42,7 +42,7 @@ object build extends Build{
   )
 
   val u = "0.6.3"
-  val xtendVersion = "2.3.0"
+  val lombokVersion = "0.11.2"
 
   lazy val server = Project(
     "server",
@@ -53,33 +53,26 @@ object build extends Build{
       },
       libraryDependencies ++= Seq(
         "net.databinder" %% "unfiltered-spec" % u % "test",
-        "log4j" % "log4j" % "1.2.16" % "compile",
-        "org.eclipse.xtend" % "org.eclipse.xtend.lib" % xtendVersion,
-        "org.eclipse.xtext" % "org.eclipse.xtext.xbase.lib" % xtendVersion,
-        "org.eclipse.xtend" % "org.eclipse.xtend.standalone" % xtendVersion,
-        "org.eclipse.emf" % "codegen" % "2.2.3"
+        "org.projectlombok" % "lombok" % "0.11.2"
       ),
       libraryDependencies <+= sbtDependency,
       resolvers ++= Seq(
-        "http://fornax-platform.org/nexus/content/groups/public/",
-        "https://oss.sonatype.org/content/repositories/releases/",
-        "http://build.eclipse.org/common/xtend/maven/",
-        "http://maven.eclipse.org/nexus/content/groups/public/"
+        "https://oss.sonatype.org/content/repositories/releases/"
       ).map{u => u at u},
-      sourceGenerators in Compile <+= (sourceManaged in Compile).map{xtendVersionInfoGenerate},
+      sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate},
       retrieveManaged := true
     )
   )dependsOn(common)
 
-  def xtendVersionInfoGenerate(dir:File):Seq[File] = {
+  def lombokVersionInfoGenerate(dir:File):Seq[File] = {
     val src =
-      """package com.herokuapp.xtend
+      """package com.herokuapp.lombok
         |
-        |object XtendVersion{
+        |object lombokVersion{
         |  def apply() = "%s"
-        |}""".format(xtendVersion).stripMargin
+        |}""".format(lombokVersion).stripMargin
     println(src)
-    val file = dir / "XtendVersion.scala"
+    val file = dir / "lombokVersion.scala"
     IO.write(file,src)
     Seq(file)
   }

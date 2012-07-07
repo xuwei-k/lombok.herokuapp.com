@@ -1,1 +1,1 @@
-web: server/target/start com.herokuapp.xtend.Web
+web: server/target/start com.herokuapp.lombok.Web

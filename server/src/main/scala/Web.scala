@@ -1,4 +1,4 @@
-package com.herokuapp.xtend
+package com.herokuapp.lombok
 
 import scalaz._,Scalaz._
 import unfiltered.request._
@@ -6,66 +6,45 @@ import unfiltered.response._
 import util.Properties
 import sbt.{Path=>_,Logger=>_,Level=>_,_}
 import java.io.{Writer,File}
-import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
-import org.apache.log4j.BasicConfigurator
-import org.eclipse.xtend.core.XtendStandaloneSetup
 import net.liftweb.json._
-import org.apache.log4j.{Logger => Log4jLogger,Level,WriterAppender,HTMLLayout,SimpleLayout,Layout}
+import lombok.delombok.Delombok
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
   lazy val jarList = { file("lib_managed") ** "*.jar" get } :+ IO.classLocationFile[Predef.type]
 
-  def xtend2java(src:Seq[SourceFile]) = {
+  def lombok2java(src:Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>
       src.foreach{f =>
         IO.writeLines(in / f.name ,f.contents.pure[Seq] )
       }
       IO.withTemporaryDirectory{out =>
-        compileXtend(out,in,jarList)
+        delombok(out,in,jarList)
       }
     }
   }
 
-  def createLoggers():(Writer,Writer) = {
-    val logger = Log4jLogger.getLogger("org.eclipse.xtext")
-    logger.setAdditivity(false)
-    logger.setLevel(Level.DEBUG)
-    logger.removeAllAppenders()
-    def add(layout:Layout):Writer = {
-      val w = new java.io.CharArrayWriter
-      val appender = new WriterAppender(layout,w)
-      logger.addAppender(appender)
-      w
-    }
-    (new SimpleLayout(),new HTMLLayout()).mapElements(add,add)
-  }
-
-  def compileXtend(out:File,in:File,cp:Seq[File]):Either[ErrorMessage,Seq[SourceFile]] = {
-    val (simple,html) = createLoggers()
+  def delombok(out:File,in:File,cp:Seq[File]):Either[String,Seq[SourceFile]] = {
     try{
-      val resultWriter = new java.io.CharArrayWriter
-      val injector = new XtendStandaloneSetup().createInjectorAndDoEMFRegistration
-      val c = injector.getInstance(classOf[XtendBatchCompiler])
-      c.setOutputPath(out.toString())
-      c.setSourcePath(in.toString())
-      c.setOutputWriter(resultWriter)
-//      c.setErrorWriter(simple) // TODO invalid ?
+      val c = new Delombok
       c.setVerbose(true)
-      c.setClassPath(cp.map{_.getAbsolutePath}.mkString(File.pathSeparator))
-      if(c.compile()){
-        (out ** "*.java").get.map{f => SourceFile(f.getName,IO.read(f))}.right
-      }else{
-        ErrorMessage(("compile fail" + simple.toString),html.toString).left
+      c.setClasspath(cp.map{_.getAbsolutePath}.mkString(java.io.File.pathSeparator))
+      c.setOutput(out)
+      c.addDirectory(in)
+      c.setCharset("UTF-8")
+      c.delombok()
+      val generated = (out ** "*.java").get.map{f => SourceFile(f.getName,IO.read(f))}
+      if(debug){
+        generated.foreach(println)
       }
+      generated.right
     }catch{
-      case e =>
-        ErrorMessage(Seq(simple.toString,e.toString).mkString("\n\n"),html.toString).left
+      case e => e.toString.left
     }
   }
 
-  val GITHUB = "https://github.com/xuwei-k/xtend.herokuapp.com"
-  val XTEND_SITE = "http://www.eclipse.org/xtend/"
+  val GITHUB = "https://github.com/xuwei-k/lombok.herokuapp.com"
+  val lombok_SITE = "http://projectlombok.org"
 
   def intent = {
     case r @ POST(Path("/")) =>
@@ -86,12 +65,12 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         } yield SourceFile(name,contents)
       }yield files
 
-      sourceFiles.map(xtend2java).map{
-        case Right(seq)  => Result(false,EmptyError,seq)
+      sourceFiles.map(lombok2java).map{
+        case Right(seq)  => Result(false,"",seq)
         case Left(error) => Result(true,error,Nil)
       }.getOrElse{
         val msg = "invalid params " + str
-        Result(true,ErrorMessage(msg,msg),Nil)
+        Result(true,msg,Nil)
       }.toJsonResponse
 
     case GET(Path("/")) =>
@@ -100,31 +79,31 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       <html>
         <head>
           <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js" />
-          <script type="text/javascript" src="/xtendheroku.js" />
-          <title>xtend {XtendVersion()} web interface</title>
-          <link rel="stylesheet" href="./xtendheroku.css" type="text/css" />
+          <script type="text/javascript" src="/lombokheroku.js" />
+          <title>lombok {lombokVersion()} web interface</title>
+          <link rel="stylesheet" href="./lombokheroku.css" type="text/css" />
           <script src="google-code-prettify/prettify.js" type="text/javascript" />
           <link href="google-code-prettify/prettify.css" rel="stylesheet" type="text/css"/>
         </head>
         <body>
-          <h1><a href={XTEND_SITE}>xtend</a> {XtendVersion()} web interface</h1>
+          <h1><a href={lombok_SITE}>lombok</a> {lombokVersion()} web interface</h1>
           <p><a href={GITHUB}>this program source code</a></p>
           <p>
             <button id='compile' >compile</button>
             <button id='clear_javacode' >clear java code</button>
             <button id='clear_error_message' >clear error message</button>
             <form>
-            <input type='radio' name='xtend_edit_type' id='edit_type_auto' value='auto'>auto</input>
-            <input type='radio' name='xtend_edit_type' id='edit_type_manual' value='manual'>manual</input>
+            <input type='radio' name='lombok_edit_type' id='edit_type_auto' value='auto'>auto</input>
+            <input type='radio' name='lombok_edit_type' id='edit_type_manual' value='manual'>manual</input>
             </form>
           </p>
           <div class='src_wrap_div'>
             <div>
-              <div id="xtendcode_wrap" class="source_code">
-                <p class="xtend_class_wrap">class <input id="xtend_class_name" type="text" />{"{"}</p>
-                <p id='xtend_file_name_wrap'>file name<input id="xtend_file_name" type="text" /></p>
-                <textarea id='xtendcode' />
-                <p class="xtend_class_wrap" >{"}"}</p>
+              <div id="lombokcode_wrap" class="source_code">
+                <p class="lombok_class_wrap">class <input id="lombok_class_name" type="text" />{"{"}</p>
+                <p id='lombok_file_name_wrap'>file name<input id="lombok_file_name" type="text" /></p>
+                <textarea id='lombokcode' />
+                <p class="lombok_class_wrap" >{"}"}</p>
               </div>
             </div>
             <div><pre class="source_code prettyprint" id='javacode'/></div>
@@ -138,17 +117,12 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
 
 case class SourceFile(name:String,contents:String)
 
-case class ErrorMessage(simple:String,html:String)
-
-object EmptyError extends ErrorMessage("","")
-
-case class Result(error:Boolean,msg:ErrorMessage,result:Seq[SourceFile]){
+case class Result(error:Boolean,msg:String,result:Seq[SourceFile]){
   import net.liftweb.json.JsonDSL._
 
   def toJsonResponse = Json(
     (Common.ERROR   -> error) ~
-    (Common.MESSAGE -> msg.simple) ~
-    (Common.HTML_MESSAGE -> msg.html) ~
+    (Common.MESSAGE -> msg) ~
     (Common.RESULT  -> JObject(result.map{f => JField(f.name,JString(f.contents))}.toList) )
   )
 }

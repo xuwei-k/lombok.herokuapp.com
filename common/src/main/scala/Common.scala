@@ -1,4 +1,4 @@
-package com.herokuapp.xtend
+package com.herokuapp.lombok
 
 object Common{
   val FILES        = "files"

@@ -1,4 +1,4 @@
-package com.herokuapp.xtend
+package com.herokuapp.lombok
 
 import scalaz._,Scalaz._
 import java.io.File
@@ -6,7 +6,7 @@ import scala.io.Source.fromFile
 import net.liftweb.json._
 import scalaj.http._
 
-object Client extends Client("http://xtend.herokuapp.com")
+object Client extends Client("http://lombok.herokuapp.com")
 
 object DebugClient extends Client("http://localhost:" + Common.DEFAULT_PORT)
 
