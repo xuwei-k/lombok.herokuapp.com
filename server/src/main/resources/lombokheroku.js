@@ -71,7 +71,7 @@ $(function(){
             $("#javacode").text(data.result[class_name + ".java"]);
             prettyPrint();
           }else{
-            $("#error_message").append(data.message)
+            $("#error_message").append("<pre>" + data.message + "</pre>")
           }
         },
         "JSON"

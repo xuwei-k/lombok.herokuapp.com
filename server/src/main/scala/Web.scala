@@ -27,6 +27,12 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
   }
 
   def delombok(out:File,in:File,cp:Seq[File]):Either[String,Seq[SourceFile]] = {
+    val o = System.out
+    val e = System.err
+    val buf = new java.io.ByteArrayOutputStream
+    val stream = new java.io.PrintStream(buf)
+    System.setOut(stream)
+    System.setErr(stream)
     try{
       val c = new Delombok
       c.setVerbose(true)
@@ -41,10 +47,15 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         }
         generated.right
       }else{
-        "compile fail".left
+        stream.close
+        ("compile fail \n" + buf.toString ).left
       }
     }catch{
       case e => e.getStackTrace.mkString(e.getMessage+"\n","\n","").left
+    }finally{
+      stream.close
+      System.setOut(o)
+      System.setErr(e)
     }
   }
 
