@@ -14,7 +14,8 @@ object build extends Build{
       },
       initialCommands in console := Seq(
         "scalaz","Scalaz","com.herokuapp.lombok"
-      ).map{"import " + _ + "._;"}.mkString
+      ).map{"import " + _ + "._;"}.mkString,
+      licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
     )
 
   lazy val root = Project(
