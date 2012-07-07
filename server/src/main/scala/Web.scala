@@ -11,7 +11,9 @@ import lombok.delombok.Delombok
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
-  lazy val jarList = { file("lib_managed") ** "*.jar" get } :+ IO.classLocationFile[Predef.type]
+  lazy val jarList = Seq("lib","lib_managed").flatMap{ dir =>
+    { file(dir) ** "*.jar" get }
+  } :+ IO.classLocationFile[Predef.type]
 
   def lombok2java(src:Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>

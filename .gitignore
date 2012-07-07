@@ -8,4 +8,5 @@ jointest/target
 *.jar
 *.class
 *.swp
+!server/lib/tools.jar
 
