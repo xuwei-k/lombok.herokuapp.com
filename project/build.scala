@@ -53,7 +53,7 @@ object build extends Build{
       },
       libraryDependencies ++= Seq(
         "net.databinder" %% "unfiltered-spec" % u % "test",
-        "org.projectlombok" % "lombok" % "0.11.2"
+        "org.projectlombok" % "lombok" % lombokVersion
       ),
       libraryDependencies <+= sbtDependency,
       resolvers ++= Seq(

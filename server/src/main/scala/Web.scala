@@ -34,14 +34,17 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       c.setOutput(out)
       c.addDirectory(in)
       c.setCharset("UTF-8")
-      c.delombok()
-      val generated = (out ** "*.java").get.map{f => SourceFile(f.getName,IO.read(f))}
-      if(debug){
-        generated.foreach(println)
+      if(c.delombok()){
+        val generated = (out ** "*.java").get.map{f => SourceFile(f.getName,IO.read(f))}
+        if(debug){
+          generated.foreach(println)
+        }
+        generated.right
+      }else{
+        "compile fail".left
       }
-      generated.right
     }catch{
-      case e => e.toString.left
+      case e => e.getStackTrace.mkString(e.getMessage+"\n","\n","").left
     }
   }
 
