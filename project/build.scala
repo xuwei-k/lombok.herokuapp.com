@@ -43,7 +43,7 @@ object build extends Build{
   )
 
   val u = "0.6.4"
-  val lombokVersion = "0.11.4"
+  val lombokVersion = "0.11.6"
 
   lazy val server = Project(
     "server",
@@ -83,7 +83,7 @@ object build extends Build{
     file("client"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaj" %% "scalaj-http" % "0.3.1",
+        "org.scalaj" %% "scalaj-http" % "0.3.2",
         "net.liftweb" % "lift-json_2.9.1" % "2.4"
       )
     )
