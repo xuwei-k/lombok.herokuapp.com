@@ -9,9 +9,9 @@ object build extends Build{
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked"),
       scalaVersion := "2.9.2",
-      shellPrompt in ThisBuild := { state =>
-        Project.extract(state).currentRef.project + "> "
-      },
+      resolvers ++= Seq(
+        "sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/"
+      ),
       initialCommands in console := Seq(
         "scalaz","Scalaz","com.herokuapp.lombok"
       ).map{"import " + _ + "._;"}.mkString,
@@ -57,9 +57,6 @@ object build extends Build{
         "org.projectlombok" % "lombok" % lombokVersion
       ),
       libraryDependencies <+= sbtDependency,
-      resolvers ++= Seq(
-        "https://oss.sonatype.org/content/repositories/releases/"
-      ).map{u => u at u},
       sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate},
       retrieveManaged := true
     )
