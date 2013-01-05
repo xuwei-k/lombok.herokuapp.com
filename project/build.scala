@@ -83,7 +83,7 @@ object build extends Build{
     file("client"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaj" %% "scalaj-http" % "0.3.2",
+        "org.scalaj" %% "scalaj-http" % "0.3.6",
         "net.liftweb" % "lift-json_2.9.1" % "2.4"
       )
     )
