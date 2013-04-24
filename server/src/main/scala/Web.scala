@@ -4,8 +4,8 @@ import scalaz._,Scalaz._
 import unfiltered.request._
 import unfiltered.response._
 import util.Properties
-import sbt.{Path=>_,Logger=>_,Level=>_,_}
-import java.io.{Writer,File}
+import sbt.{Path=>_, Logger=>_, Level=>_, _}
+import java.io.{Writer, File}
 import net.liftweb.json._
 import lombok.delombok.Delombok
 
@@ -15,10 +15,10 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
     { file(dir) ** "*.jar" get }
   } :+ IO.classLocationFile[Predef.type]
 
-  def lombok2java(src:Seq[SourceFile]) = {
+  def lombok2java(src: Seq[SourceFile]) = {
     IO.withTemporaryDirectory{in =>
       src.foreach{f =>
-        IO.writeLines(in / f.name ,f.contents.pure[Seq] )
+        IO.writeLines(in / f.name, Seq(f.contents))
       }
       IO.withTemporaryDirectory{out =>
         delombok(out,in,jarList)
@@ -26,7 +26,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
     }
   }
 
-  def delombok(out:File,in:File,cp:Seq[File]):Either[String,Seq[SourceFile]] = {
+  def delombok(out: File, in: File, cp: Seq[File]): String \/ Seq[SourceFile] = {
     val o = System.out
     val e = System.err
     val buf = new java.io.ByteArrayOutputStream
@@ -82,8 +82,8 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       }yield files
 
       sourceFiles.map(lombok2java).map{
-        case Right(seq)  => Result(false,"",seq)
-        case Left(error) => Result(true,error,Nil)
+        case \/-(seq)   => Result(false,"",seq)
+        case -\/(error) => Result(true,error,Nil)
       }.getOrElse{
         val msg = "invalid params " + str
         Result(true,msg,Nil)

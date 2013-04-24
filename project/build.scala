@@ -1,5 +1,5 @@
 import sbt._,Keys._
-import com.typesafe.startscript.StartScriptPlugin._
+import com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings
 
 object build extends Build{
 
@@ -8,13 +8,9 @@ object build extends Build{
       organization := "com.herokuapp.lombok",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked"),
-      scalaVersion := "2.9.2",
       resolvers ++= Seq(
-        "sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/"
+        Opts.resolver.sonatypeReleases
       ),
-      initialCommands in console := Seq(
-        "scalaz","Scalaz","com.herokuapp.lombok"
-      ).map{"import " + _ + "._;"}.mkString,
       licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
     )
 
@@ -37,7 +33,7 @@ object build extends Build{
     file("common"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaz" %% "scalaz-core" % "6.0.4"
+        "org.scalaz" %% "scalaz-core" % "7.0.0"
       )
     )
   )
@@ -49,7 +45,7 @@ object build extends Build{
     "server",
     file("server"),
     settings = buildSettings ++ startScriptForClassesSettings ++ Seq(
-      libraryDependencies ++= Seq("filter","jetty","json").map{n=>
+      libraryDependencies ++= Seq("filter", "jetty", "json").map{n=>
         "net.databinder" %% ("unfiltered-"+n) % u
       },
       libraryDependencies ++= Seq(
@@ -81,7 +77,7 @@ object build extends Build{
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
         "org.scalaj" %% "scalaj-http" % "0.3.6",
-        "net.liftweb" % "lift-json_2.9.1" % "2.4"
+        "org.json4s" %% "json4s-native" % "3.2.4"
       )
     )
   )dependsOn(common)
