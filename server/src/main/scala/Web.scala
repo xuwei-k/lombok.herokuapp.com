@@ -1,12 +1,14 @@
 package com.herokuapp.lombok
 
-import scalaz._,Scalaz._
+import scalaz._
+import syntax.either._
 import unfiltered.request._
 import unfiltered.response._
 import util.Properties
 import sbt.{Path=>_, Logger=>_, Level=>_, _}
 import java.io.{Writer, File}
-import net.liftweb.json._
+import org.json4s._
+import org.json4s.native.JsonMethods
 import lombok.delombok.Delombok
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
@@ -51,7 +53,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         ("compile fail \n" + buf.toString ).left
       }
     }catch{
-      case e => e.getStackTrace.mkString(e.getMessage+"\n","\n","").left
+      case e: Throwable => e.getStackTrace.mkString(e.getMessage+"\n","\n","").left
     }finally{
       stream.close
       System.setOut(o)
@@ -67,15 +69,15 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       val str = Body.string(r)
       if(debug){
         println(str)
-        parseOpt(str).map{ j =>
-          println(pretty(render(j)))
+        JsonMethods.parseOpt(str).map{ j =>
+          println(JsonMethods.pretty(JsonMethods.render(j)))
         }.getOrElse{
           println("fail parse json. " + str + " is not valid json")
         }
       }
 
       val sourceFiles = for{
-        JObject(List(JField(Common.FILES,JObject(json)))) <- parseOpt(str)
+        JObject(List(JField(Common.FILES,JObject(json)))) <- JsonMethods.parseOpt(str)
         files = for{
           JField(name,JString(contents)) <- json
         } yield SourceFile(name,contents)
@@ -94,11 +96,11 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       Html(
       <html>
         <head>
-          <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js" />
-          <script type="text/javascript" src="/lombokheroku.js" />
+          <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.2.js"></script>
+          <script type="text/javascript" src="/lombokheroku.js"></script>
           <title>lombok {lombokVersion()} web interface</title>
           <link rel="stylesheet" href="./lombokheroku.css" type="text/css" />
-          <script src="google-code-prettify/prettify.js" type="text/javascript" />
+          <script src="google-code-prettify/prettify.js" type="text/javascript"></script>
           <link href="google-code-prettify/prettify.css" rel="stylesheet" type="text/css"/>
         </head>
         <body>
@@ -118,7 +120,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
               <div id="lombokcode_wrap" class="source_code">
                 <p class="lombok_class_wrap">class <input id="lombok_class_name" type="text" />{"{"}</p>
                 <p id='lombok_file_name_wrap'>file name<input id="lombok_file_name" type="text" /></p>
-                <textarea id='lombokcode' />
+                <textarea id='lombokcode'></textarea>
                 <p class="lombok_class_wrap" >{"}"}</p>
               </div>
             </div>
@@ -134,7 +136,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
 case class SourceFile(name:String,contents:String)
 
 case class Result(error:Boolean,msg:String,result:Seq[SourceFile]){
-  import net.liftweb.json.JsonDSL._
+  import org.json4s.JsonDSL._
 
   def toJsonResponse = Json(
     (Common.ERROR   -> error) ~
