@@ -55,8 +55,7 @@ object build extends Build{
         "org.projectlombok" % "lombok" % lombokVersion,
         "org.scala-sbt" % "io" % sbtVersion.value
       ),
-      sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate},
-      retrieveManaged := true
+      sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate}
     )
   )dependsOn(common)
 

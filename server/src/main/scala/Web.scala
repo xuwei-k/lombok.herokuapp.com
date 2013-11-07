@@ -14,7 +14,7 @@ import lombok.delombok.Delombok
 
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
-  lazy val jarList = Seq("lib","lib_managed").flatMap{ dir =>
+  lazy val jarList = Seq("lib").flatMap{ dir =>
     { new File(dir) ** "*.jar" get }
   } :+ IO.classLocationFile[Predef.type]
 
