@@ -1,0 +1,5 @@
+project/boot
+project/target
+client
+jointest
+.sbt_home

@@ -40,8 +40,8 @@ object build extends Build{
     )
   )
 
-  val u = "0.7.0"
-  val lombokVersion = "1.12.2"
+  final val u = "0.7.0"
+  final val lombokVersion = "1.12.2"
 
   lazy val server = Project(
     "server",
@@ -51,7 +51,6 @@ object build extends Build{
         "net.databinder" %% ("unfiltered-"+n) % u
       },
       libraryDependencies ++= Seq(
-        "net.databinder" %% "unfiltered-spec" % u % "test",
         "org.projectlombok" % "lombok" % lombokVersion,
         "org.scala-sbt" % "io" % sbtVersion.value
       ),
