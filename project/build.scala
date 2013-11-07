@@ -52,9 +52,9 @@ object build extends Build{
       },
       libraryDependencies ++= Seq(
         "net.databinder" %% "unfiltered-spec" % u % "test",
-        "org.projectlombok" % "lombok" % lombokVersion
+        "org.projectlombok" % "lombok" % lombokVersion,
+        "org.scala-sbt" % "io" % sbtVersion.value
       ),
-      libraryDependencies <+= sbtDependency,
       sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate},
       retrieveManaged := true
     )

@@ -5,7 +5,8 @@ import syntax.either._
 import unfiltered.request._
 import unfiltered.response._
 import util.Properties
-import sbt.{Path=>_, Logger=>_, Level=>_, _}
+import sbt.{Path=>_, _}
+import sbt.Path._
 import java.io.{Writer, File}
 import org.json4s._
 import org.json4s.native.JsonMethods
@@ -14,7 +15,7 @@ import lombok.delombok.Delombok
 class App(debug:Boolean) extends unfiltered.filter.Plan {
 
   lazy val jarList = Seq("lib","lib_managed").flatMap{ dir =>
-    { file(dir) ** "*.jar" get }
+    { new File(dir) ** "*.jar" get }
   } :+ IO.classLocationFile[Predef.type]
 
   def lombok2java(src: Seq[SourceFile]) = {
