@@ -8,7 +8,7 @@ object build extends Build{
       organization := "com.herokuapp.lombok",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked", "-language:_", "-Xlint"),
-      scalaVersion := "2.10.3-RC3",
+      scalaVersion := "2.10.3",
       resolvers ++= Seq(
         Opts.resolver.sonatypeReleases,
         Classpaths.typesafeResolver
@@ -41,7 +41,7 @@ object build extends Build{
   )
 
   val u = "0.7.0"
-  val lombokVersion = "0.12.0"
+  val lombokVersion = "1.12.2"
 
   lazy val server = Project(
     "server",
