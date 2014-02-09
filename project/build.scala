@@ -8,7 +8,7 @@ object build extends Build{
       organization := "com.herokuapp.lombok",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked", "-language:_", "-Xlint"),
-      scalaVersion := "2.10.3",
+      scalaVersion := "2.10.4-RC2",
       resolvers ++= Seq(
         Opts.resolver.sonatypeReleases,
         Classpaths.typesafeResolver
@@ -35,13 +35,13 @@ object build extends Build{
     file("common"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaz" %% "scalaz-core" % "7.1.0-M3"
+        "org.scalaz" %% "scalaz-core" % "7.1.0-M5"
       )
     )
   )
 
-  val u = "0.7.0"
-  val lombokVersion = "1.12.2"
+  val u = "0.7.1"
+  val lombokVersion = "1.12.4"
 
   lazy val server = Project(
     "server",
@@ -78,8 +78,8 @@ object build extends Build{
     file("client"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaj" %% "scalaj-http" % "0.3.10",
-        "org.json4s" %% "json4s-native" % "3.2.5"
+        "org.scalaj" %% "scalaj-http" % "0.3.14",
+        "org.json4s" %% "json4s-native" % "3.2.6"
       )
     )
   )dependsOn(common)

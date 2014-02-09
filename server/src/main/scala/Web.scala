@@ -97,7 +97,7 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       Html(
       <html>
         <head>
-          <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.2.js"></script>
+          <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.js"></script>
           <script type="text/javascript" src="/lombokheroku.js"></script>
           <title>lombok {lombokVersion()} web interface</title>
           <link rel="stylesheet" href="./lombokheroku.css" type="text/css" />
