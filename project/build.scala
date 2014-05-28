@@ -35,13 +35,13 @@ object build extends Build{
     file("common"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaz" %% "scalaz-core" % "7.1.0-M6"
+        "org.scalaz" %% "scalaz-core" % "7.1.0-M7"
       )
     )
   )
 
-  val u = "0.7.1"
-  val lombokVersion = "1.12.6"
+  val u = "0.8.0"
+  val lombokVersion = "1.14.0"
 
   lazy val server = Project(
     "server",
@@ -51,7 +51,6 @@ object build extends Build{
         "net.databinder" %% ("unfiltered-"+n) % u
       },
       libraryDependencies ++= Seq(
-        "net.databinder" %% "unfiltered-spec" % u % "test",
         "org.projectlombok" % "lombok" % lombokVersion,
         "org.scala-sbt" % "io" % sbtVersion.value
       ),
@@ -79,7 +78,7 @@ object build extends Build{
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
         "org.scalaj" %% "scalaj-http" % "0.3.14",
-        "org.json4s" %% "json4s-native" % "3.2.6"
+        "org.json4s" %% "json4s-native" % "3.2.10"
       )
     )
   )dependsOn(common)
