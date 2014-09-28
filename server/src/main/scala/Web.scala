@@ -98,9 +98,9 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
       <html>
         <head>
           <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.js"></script>
-          <script type="text/javascript" src="/lombokheroku.js"></script>
+          <script type="text/javascript" src={LOMBOK_HEROKU_JS}></script>
           <title>lombok {lombokVersion()} web interface</title>
-          <link rel="stylesheet" href="./lombokheroku.css" type="text/css" />
+          <link rel="stylesheet" href={LOMBOK_HEROKU_CSS} type="text/css" />
           <script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js" type="text/javascript"></script>
           <link href="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.css" rel="stylesheet" type="text/css"/>
         </head>
@@ -131,7 +131,18 @@ class App(debug:Boolean) extends unfiltered.filter.Plan {
         </body>
       </html>
       )
+    case GET(Path(LOMBOK_HEROKU_JS)) =>
+      JsResponse
+    case GET(Path(LOMBOK_HEROKU_CSS)) =>
+      CssResponse
   }
+
+  private[this] final val LOMBOK_HEROKU_JS = "/lombokheroku.js"
+  private[this] final val LOMBOK_HEROKU_CSS = "/lombokheroku.css"
+  private[this] final val JsResponse =
+    Ok ~> ResponseString(IO.readStream(getClass.getResourceAsStream(LOMBOK_HEROKU_JS)))
+  private[this] final val CssResponse =
+    Ok ~> ResponseString(IO.readStream(getClass.getResourceAsStream(LOMBOK_HEROKU_CSS)))
 }
 
 case class SourceFile(name:String,contents:String)
@@ -154,7 +165,7 @@ object Web {
     if(debug){
       unfiltered.util.Browser.open("http://127.0.0.1:" + port)
     }
-    unfiltered.jetty.Http(port).resources(getClass.getResource("/")).filter(new App(debug)).run
+    unfiltered.jetty.Http(port).filter(new App(debug)).run
   }
 }
 
