@@ -1,17 +1,18 @@
 import sbt._,Keys._
-import com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings
+import com.heroku.sbt.HerokuPlugin
+import com.typesafe.sbt.SbtNativePackager._
 
 object build extends Build{
 
   lazy val buildSettings =
-    Defaults.defaultSettings ++ Seq(
+    Seq(
       organization := "com.herokuapp.lombok",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked", "-language:_", "-Xlint"),
       scalaVersion := "2.11.2",
       resolvers ++= Seq(
         Opts.resolver.sonatypeReleases,
-        Classpaths.typesafeResolver
+        Classpaths.typesafeReleases
       ),
       licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
     )
@@ -19,7 +20,7 @@ object build extends Build{
   lazy val root = Project(
     "root",
     file("."),
-    settings = buildSettings ++ startScriptForClassesSettings ++ Seq(
+    settings = buildSettings ++ Seq(
     )
   )aggregate(server,client,common,jointest)
 
@@ -45,19 +46,18 @@ object build extends Build{
 
   lazy val server = Project(
     "server",
-    file("server"),
-    settings = buildSettings ++ startScriptForClassesSettings ++ Seq(
-      libraryDependencies ++= Seq("filter", "jetty", "json4s").map{n=>
-        "net.databinder" %% ("unfiltered-"+n) % u
-      },
-      libraryDependencies ++= Seq(
-        "org.projectlombok" % "lombok" % lombokVersion,
-        "org.scala-sbt" %% "io" % sbtVersion.value
-      ),
-      sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate},
-      retrieveManaged := true
-    )
-  )dependsOn(common)
+    file("server")
+  ).settings(buildSettings ++ packageArchetype.java_application: _*).enablePlugins(HerokuPlugin).settings(
+    HerokuPlugin.autoImport.herokuAppName in Compile := "lombok",
+    libraryDependencies ++= Seq("filter", "jetty", "json4s").map{n=>
+      "net.databinder" %% ("unfiltered-"+n) % u
+    },
+    libraryDependencies ++= Seq(
+      "org.projectlombok" % "lombok" % lombokVersion,
+      "org.scala-sbt" %% "io" % sbtVersion.value
+    ),
+    sourceGenerators in Compile <+= (sourceManaged in Compile).map{lombokVersionInfoGenerate}
+  ).dependsOn(common)
 
   def lombokVersionInfoGenerate(dir:File):Seq[File] = {
     val src =
