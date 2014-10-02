@@ -165,7 +165,7 @@ object Web {
     if(debug){
       unfiltered.util.Browser.open("http://127.0.0.1:" + port)
     }
-    unfiltered.jetty.Http(port).filter(new App(debug)).run
+    unfiltered.jetty.Server.http(port).plan(new App(debug)).run
   }
 }
 
