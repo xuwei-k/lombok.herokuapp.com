@@ -9,7 +9,7 @@ object build extends Build{
       organization := "com.herokuapp.lombok",
       version := "0.1.0-SNAPSHOT",
       scalacOptions := Seq("-deprecation", "-unchecked", "-language:_", "-Xlint"),
-      scalaVersion := "2.11.3",
+      scalaVersion := "2.11.2",
       resolvers ++= Seq(
         Opts.resolver.sonatypeReleases,
         Classpaths.typesafeReleases
