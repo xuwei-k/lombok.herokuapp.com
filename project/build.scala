@@ -36,7 +36,7 @@ object build extends Build{
     file("common"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalaz" %% "scalaz-core" % "7.1.0"
+        "org.scalaz" %% "scalaz-core" % "7.1.2"
       )
     )
   )
